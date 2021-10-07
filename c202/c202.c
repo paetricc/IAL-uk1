@@ -73,8 +73,8 @@ void Stack_Error( int error_code ) {
  * @param stack Ukazatel na strukturu zásobníku
  */
 void Stack_Init( Stack *stack ) {
-
-    solved = FALSE; /* V případě řešení, smažte tento řádek! */
+	stack->top = 0;
+    //solved = FALSE; /* V případě řešení, smažte tento řádek! */
 }
 
 /**

@@ -73,8 +73,11 @@ void Stack_Error( int error_code ) {
  * @param stack Ukazatel na strukturu zásobníku
  */
 void Stack_Init( Stack *stack ) {
-	stack->top = 0;
-    //solved = FALSE; /* V případě řešení, smažte tento řádek! */
+	if (stack == NULL) {
+		Stack_Error(SERR_INIT);
+	}
+	stack->topIndex = -1;
+    // solved = FALSE; /* V případě řešení, smažte tento řádek! */
 }
 
 /**
@@ -87,8 +90,8 @@ void Stack_Init( Stack *stack ) {
  * @returns Nenulovou hodnotu v případě, že je zásobník prázdný, jinak nulu
  */
 int Stack_IsEmpty( const Stack *stack ) {
-
-    solved = FALSE; /* V případě řešení, smažte tento řádek! */
+	return stack->topIndex == -1;
+    //solved = FALSE; /* V případě řešení, smažte tento řádek! */
 }
 
 /**
@@ -104,8 +107,8 @@ int Stack_IsEmpty( const Stack *stack ) {
  * @returns Nenulovou hodnotu v případě, že je zásobník plný, jinak nulu
  */
 int Stack_IsFull( const Stack *stack ) {
-
-    solved = FALSE; /* V případě řešení, smažte tento řádek! */
+	return stack->topIndex == STACK_SIZE-1; 
+    // solved = FALSE; /* V případě řešení, smažte tento řádek! */
 }
 
 /**
@@ -121,8 +124,11 @@ int Stack_IsFull( const Stack *stack ) {
  * @param dataPtr Ukazatel na cílovou proměnnou
  */
 void Stack_Top( const Stack *stack, char *dataPtr ) {
-
-    solved = FALSE; /* V případě řešení, smažte tento řádek! */
+	if(Stack_IsEmpty(stack)) {
+		Stack_Error(SERR_TOP);
+	}
+	*dataPtr = stack->array[stack->topIndex];
+    // solved = FALSE; /* V případě řešení, smažte tento řádek! */
 }
 
 
@@ -139,8 +145,10 @@ void Stack_Top( const Stack *stack, char *dataPtr ) {
  * @param stack Ukazatel na inicializovanou strukturu zásobníku
  */
 void Stack_Pop( Stack *stack ) {
-
-    solved = FALSE; /* V případě řešení, smažte tento řádek! */
+	if(!Stack_IsEmpty(stack)) {
+		stack->array[stack->topIndex--];
+	}
+    // solved = FALSE; /* V případě řešení, smažte tento řádek! */
 }
 
 
@@ -155,8 +163,12 @@ void Stack_Pop( Stack *stack ) {
  * @param data Znak k vložení
  */
 void Stack_Push( Stack *stack, char data ) {
-
-    solved = FALSE; /* V případě řešení, smažte tento řádek! */
+	if (Stack_IsFull(stack)) {
+		Stack_Error(SERR_PUSH);
+	}
+	stack->topIndex++;
+	stack->array[stack->topIndex] = data;
+    // solved = FALSE; /* V případě řešení, smažte tento řádek! */
 }
 
 /* Konec c202.c */

@@ -146,7 +146,7 @@ void Stack_Top( const Stack *stack, char *dataPtr ) {
  */
 void Stack_Pop( Stack *stack ) {
 	if(!Stack_IsEmpty(stack)) {
-		stack->array[stack->topIndex--];
+		stack->topIndex--;		
 	}
     // solved = FALSE; /* V případě řešení, smažte tento řádek! */
 }

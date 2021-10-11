@@ -36,6 +36,20 @@
 
 int solved;
 
+int operator(char c) {
+    switch (c)
+    {
+    case '+':
+    case '-':
+        return 1;
+    case '*':
+    case '/':
+        return 2;
+    default:
+        return -1;
+    }
+}
+
 /**
  * Pomocná funkce untilLeftPar.
  * Slouží k vyprázdnění zásobníku až po levou závorku, přičemž levá závorka bude
@@ -55,7 +69,19 @@ int solved;
  * @param postfixExpressionLength Ukazatel na aktuální délku výsledného postfixového výrazu
  */
 void untilLeftPar( Stack *stack, char *postfixExpression, unsigned *postfixExpressionLength ) {
+    char top = '0';
+    if (!Stack_IsEmpty(stack)) {
+        Stack_Top(stack, &top);
+    }
 
+    for (;!Stack_IsEmpty(stack) && top != '(';) {
+        postfixExpression[(*postfixExpressionLength)++] = top;
+        Stack_Pop(stack);
+        if (!Stack_IsEmpty(stack)) {
+            Stack_Top(stack, &top);
+        }
+    }
+    Stack_Pop(stack);
 }
 
 /**
@@ -75,7 +101,19 @@ void untilLeftPar( Stack *stack, char *postfixExpression, unsigned *postfixExpre
  * @param postfixExpressionLength Ukazatel na aktuální délku výsledného postfixového výrazu
  */
 void doOperation( Stack *stack, char c, char *postfixExpression, unsigned *postfixExpressionLength ) {
+    char top = '0';
+    if (!Stack_IsEmpty(stack)) {
+        Stack_Top(stack, &top);
+    }
 
+    for (;!Stack_IsEmpty(stack) && operator(c) <= operator(top);) {
+        postfixExpression[(*postfixExpressionLength)++] = top;
+        Stack_Pop(stack);
+        if (!Stack_IsEmpty(stack)) {
+            Stack_Top(stack, &top);
+        }
+    }
+    Stack_Push(stack, c);
 }
 
 /**
@@ -126,10 +164,41 @@ void doOperation( Stack *stack, char c, char *postfixExpression, unsigned *postf
  *
  * @returns Znakový řetězec obsahující výsledný postfixový výraz
  */
+
 char *infix2postfix( const char *infixExpression ) {
 
-    solved = FALSE; /* V případě řešení smažte tento řádek! */
-    return NULL; /* V případě řešení můžete smazat tento řádek. */
+    char *p = (char *) malloc(sizeof(char) * MAX_LEN);
+    Stack *stack = (Stack *) malloc(sizeof(Stack));
+    Stack_Init(stack);
+    int i = 0;
+    unsigned int *k = (unsigned int *) malloc(sizeof(int));
+    *k = 0;
+    
+    for (; infixExpression[i] != '\0' ; i++) {
+
+        if ((infixExpression[i] >= 'A' && infixExpression[i] <= 'Z') 
+        || (infixExpression[i] >= 'a' && infixExpression[i] <=  'z')
+        || (infixExpression[i] >= '0' && infixExpression[i] <= '9')) {
+            p[(*k)++] = infixExpression[i];
+
+        } else if (infixExpression[i] == '(') {
+            Stack_Push(stack, infixExpression[i]);
+        } else if (infixExpression[i] == ')') {
+            untilLeftPar(stack, p, k);
+        } else {
+            doOperation(stack, infixExpression[i], p, k);
+        }
+        
+        
+
+    }
+    
+    p[(*k)++] = '=';
+    p[(*k)++] = '\0';
+    free(stack);
+    free(k);
+    //solved = FALSE; /* V případě řešení smažte tento řádek! */
+    return p; /* V případě řešení můžete smazat tento řádek. */
 }
 
 /* Konec c204.c */

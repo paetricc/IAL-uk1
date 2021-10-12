@@ -36,17 +36,43 @@
 
 int solved;
 
-int operator(char c) {
-    switch (c)
-    {
-    case '+':
-    case '-':
+/**
+ * Pomocna funkce isOperand.
+ * Slouzi k urceni zda vstupni char je operand.
+ * Operandem rozumime mala pismena a-z, velka pismena A-Z a cisla 0-9.
+ * 
+ * @param c Znak u ktereho mame urcit zda se jedna o operator.
+ * 
+ * @returns Pokud vstupni char je operand vrati 1 jinak vrati 0 . 
+ */
+int isOperand(char c) {
+    if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <=  'z') || (c >= '0' && c <= '9')) {
         return 1;
-    case '*':
-    case '/':
-        return 2;
-    default:
-        return -1;
+    } else {
+        return 0;
+    }  
+}
+
+/**
+ * Pomocna funkce operatorPriority.
+ * Slouzi k rozhodnuti priority operatoru. Cim vyssi cislo funkce vraci,
+ * tim vyssi je priorita operatoru
+ *
+ * @param c Znak operatoru u ktereho mame urcit prioritu.
+ * 
+ * @returns Priorita operatoru
+ *
+ */
+int operatorPriority(char c) {
+    switch (c) {
+        case '+':
+        case '-':
+            return 1;
+        case '*':
+        case '/':
+            return 2;
+        default:
+            return -1;
     }
 }
 
@@ -69,18 +95,22 @@ int operator(char c) {
  * @param postfixExpressionLength Ukazatel na aktuální délku výsledného postfixového výrazu
  */
 void untilLeftPar( Stack *stack, char *postfixExpression, unsigned *postfixExpressionLength ) {
+    //vytvorime si promennou do ktere bude ukladat znak nachazejici se na vrcholu zasobniku
     char top = '0';
+    //nesmime sahat na vrchol zasobniku kdyz je prazdny
     if (!Stack_IsEmpty(stack)) {
         Stack_Top(stack, &top);
     }
-
+    //dokud zasobnik neni prazdny a zaroven neni na vrcholu zasobniku ukoncovaci(z pohledu logiky) zavorka tak davej operatory na vystup 
     for (;!Stack_IsEmpty(stack) && top != '(';) {
         postfixExpression[(*postfixExpressionLength)++] = top;
         Stack_Pop(stack);
+        //kontrola jestli je tam dalsi operator (nemuzeme sahat na prazdny zasobnik)
         if (!Stack_IsEmpty(stack)) {
             Stack_Top(stack, &top);
         }
     }
+    // odstaneni '(' zavorky protoze uz neni potreba
     Stack_Pop(stack);
 }
 
@@ -101,18 +131,22 @@ void untilLeftPar( Stack *stack, char *postfixExpression, unsigned *postfixExpre
  * @param postfixExpressionLength Ukazatel na aktuální délku výsledného postfixového výrazu
  */
 void doOperation( Stack *stack, char c, char *postfixExpression, unsigned *postfixExpressionLength ) {
+    //vytvorime si promennou do ktere bude ukladat znak nachazejici se na vrcholu zasobniku
     char top = '0';
+    //nesmime sahat na vrchol zasobniku kdyz je prazdny
     if (!Stack_IsEmpty(stack)) {
         Stack_Top(stack, &top);
     }
-
-    for (;!Stack_IsEmpty(stack) && operator(c) <= operator(top);) {
+    //dokud zasobnik neni prazdny a zaroven priorita operatoru je mensi nez priorita operatoru na vrcholu zasobniku tak davej operatory na vystup 
+    for (;!Stack_IsEmpty(stack) && operatorPriority(c) <= operatorPriority(top);) {
         postfixExpression[(*postfixExpressionLength)++] = top;
         Stack_Pop(stack);
+        //kontrola jestli je tam dalsi operator (nemuzeme sahat na prazdny zasobnik)
         if (!Stack_IsEmpty(stack)) {
             Stack_Top(stack, &top);
         }
     }
+    // pro dalsi pouziti
     Stack_Push(stack, c);
 }
 
@@ -166,21 +200,25 @@ void doOperation( Stack *stack, char c, char *postfixExpression, unsigned *postf
  */
 
 char *infix2postfix( const char *infixExpression ) {
-
+    //alokace proměnných
     char *p = (char *) malloc(sizeof(char) * MAX_LEN);
     Stack *stack = (Stack *) malloc(sizeof(Stack));
+    unsigned int *k = (unsigned int *) malloc(sizeof(int));
+    //kontrola spravnosti alokace
+    if (!p || !stack || !k ) {
+        return NULL;
+    }
+    //inicialice
     Stack_Init(stack);
     int i = 0;
-    unsigned int *k = (unsigned int *) malloc(sizeof(int));
     *k = 0;
     
     for (; infixExpression[i] != '\0' ; i++) {
-
-        if ((infixExpression[i] >= 'A' && infixExpression[i] <= 'Z') 
-        || (infixExpression[i] >= 'a' && infixExpression[i] <=  'z')
-        || (infixExpression[i] >= '0' && infixExpression[i] <= '9')) {
+        //pokud je znakem operand tak ho dej na vystup
+        if (isOperand(infixExpression[i])) {
             p[(*k)++] = infixExpression[i];
-
+        /*  zacina zavorka takze je treba si dat znak na vrchol zasobniku
+            abychom vedeli po co mame pak nasledne odebirat operatory */
         } else if (infixExpression[i] == '(') {
             Stack_Push(stack, infixExpression[i]);
         } else if (infixExpression[i] == ')') {
@@ -188,16 +226,14 @@ char *infix2postfix( const char *infixExpression ) {
         } else {
             doOperation(stack, infixExpression[i], p, k);
         }
-        
-        
-
     }
     
     p[(*k)++] = '=';
+    //aby byl retezec korektni
     p[(*k)++] = '\0';
+    //uvolneni pameti
     free(stack);
     free(k);
-    //solved = FALSE; /* V případě řešení smažte tento řádek! */
     return p; /* V případě řešení můžete smazat tento řádek. */
 }
 

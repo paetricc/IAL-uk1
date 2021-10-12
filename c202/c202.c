@@ -75,9 +75,9 @@ void Stack_Error( int error_code ) {
 void Stack_Init( Stack *stack ) {
 	if (stack == NULL) {
 		Stack_Error(SERR_INIT);
+	} else {
+		stack->topIndex = -1;
 	}
-	stack->topIndex = -1;
-    // solved = FALSE; /* V případě řešení, smažte tento řádek! */
 }
 
 /**
@@ -91,7 +91,6 @@ void Stack_Init( Stack *stack ) {
  */
 int Stack_IsEmpty( const Stack *stack ) {
 	return stack->topIndex == -1;
-    //solved = FALSE; /* V případě řešení, smažte tento řádek! */
 }
 
 /**
@@ -108,7 +107,6 @@ int Stack_IsEmpty( const Stack *stack ) {
  */
 int Stack_IsFull( const Stack *stack ) {
 	return stack->topIndex == STACK_SIZE-1; 
-    // solved = FALSE; /* V případě řešení, smažte tento řádek! */
 }
 
 /**
@@ -126,9 +124,9 @@ int Stack_IsFull( const Stack *stack ) {
 void Stack_Top( const Stack *stack, char *dataPtr ) {
 	if(Stack_IsEmpty(stack)) {
 		Stack_Error(SERR_TOP);
+	} else {
+		*dataPtr = stack->array[stack->topIndex];
 	}
-	*dataPtr = stack->array[stack->topIndex];
-    // solved = FALSE; /* V případě řešení, smažte tento řádek! */
 }
 
 
@@ -148,7 +146,6 @@ void Stack_Pop( Stack *stack ) {
 	if(!Stack_IsEmpty(stack)) {
 		stack->topIndex--;		
 	}
-    // solved = FALSE; /* V případě řešení, smažte tento řádek! */
 }
 
 
@@ -165,10 +162,10 @@ void Stack_Pop( Stack *stack ) {
 void Stack_Push( Stack *stack, char data ) {
 	if (Stack_IsFull(stack)) {
 		Stack_Error(SERR_PUSH);
+	} else {
+		stack->topIndex++;
+		stack->array[stack->topIndex] = data;
 	}
-	stack->topIndex++;
-	stack->array[stack->topIndex] = data;
-    // solved = FALSE; /* V případě řešení, smažte tento řádek! */
 }
 
 /* Konec c202.c */

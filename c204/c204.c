@@ -206,6 +206,8 @@ char *infix2postfix( const char *infixExpression ) {
     unsigned int *k = (unsigned int *) malloc(sizeof(int));
     //kontrola spravnosti alokace
     if (!p || !stack || !k ) {
+        free(stack);
+        free(k);
         return NULL;
     }
     //inicialice
